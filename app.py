@@ -44,7 +44,6 @@ quick_replies_list = [{
 ]
 
 questions=['Please, write your E-mail','Please, write your mobile number','What programming languages have you used in the past? What are your top two programming languages?']
-counter=0
 # token to verify that this bot is legit
 verify_token = os.getenv('VERIFY_TOKEN', 'TESTINGTOKEN')
 # token to send messages through facebook messenger
@@ -188,8 +187,6 @@ def webhook_action():
                 user_id = message['sender']['id']
                 if message['message'].get('text'):
                     msg=message['message']['text']
-                    global counter
-                    print(counter)
                     c=get_counter(user_id)
                     if c==len(questions):
                         save_answers(msg,user_id)
@@ -232,7 +229,7 @@ def webhook_action():
                             'recipient': {'id': user_id},
                             'message': {"text": 'hi %s!' % user_name}
                         }
-                        counter=0
+                        set_counter(user_id,0)
                     else:
                         user_message = entry['messaging'][0]['message']['text']
                         response = {
@@ -276,7 +273,6 @@ def handle_message(user_id, user_message):
     return " " + response(user_message)
 
 def ans(msg,user_id):
-    global counter
     row=[]
     with open(str(user_id)+'.csv', 'a') as csvFile:
         writer = csv.writer(csvFile)
@@ -298,14 +294,19 @@ def set_counter(user_id,count):
     conn.close()
 
 def get_counter(user_id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT * FROM counter_{}'.format(user_id))
-    data = c.fetchall()
-    count=0
-    for row in data:
-        count=row
-    return count
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        c.execute('SELECT * FROM counter_{}'.format(user_id))
+        data = c.fetchall()
+        count=0
+        '''for row in data:
+            count=row'''
+        last_row=data[-1]
+        return last_row[0]
+    except:
+        print('exp')
+        return 0
 
 def save_answers(msg,user_id):
     # check if the database exist, if not create the table and insert a few lines of data
