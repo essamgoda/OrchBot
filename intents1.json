@@ -1,0 +1,56 @@
+{"intents": [
+  {"tag": "greeting",
+    "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day"],
+    "responses": ["Hello, thanks for visiting", "Good to see you again", "Hi there, how can I help?"],
+    "context_set": ""
+  },
+  {"tag": "goodbye",
+    "patterns": ["Bye", "See you later", "Goodbye"],
+    "responses": ["See you later, thanks for visiting", "Have a nice day", "Bye! Come back again soon."]
+  },
+  {"tag": "thanks",
+    "patterns": ["Thanks", "Thank you", "That's helpful"],
+    "responses": ["Happy to help!", "Any time!", "My pleasure"]
+  },
+  {"tag": "vacancy",
+    "patterns": ["vacancy","vacancies","careers","jobs"],
+    "responses": ["please, call HR 01022002", "visit our website www.orchtech/careers"],
+    "context_filter": "rentalday"
+  },
+  {"tag": "vacation",
+    "patterns": ["What about the vacations ?","vacations","vacation"],
+    "responses": ["The vacations available after 6 months and any vacation before this period it will be deduct from your salary.", "The vacation balance is 21 days : 15 days annual ( Planing) and 6 days casual"],
+    "context_filter": "rentalday"
+  },
+  {"tag": "social insurance",
+    "patterns": ["social insurance", "What about the social insurance ?"],
+    "responses": ["The company is doing the social insurance from day 1 ."]
+  },
+  {"tag": "اهلا",
+    "patterns": ["اهلا"],
+    "responses": ["اهلا بك في صفحتنا"]
+  },
+  {"tag": "وداعا",
+    "patterns": ["مع السلامة", "وداعا"],
+    "responses": ["شكرا لك على زيارة صفحتنا"]
+  },
+  {"tag": "شكرا",
+    "patterns": ["شكرا", "جزيل الشكر"],
+    "responses": ["شكرا لك على زيارة صفحتنا"]
+  },
+  {"tag": "وظيفة",
+    "patterns": ["ما هي الوظائف المتاحة ؟" ,"توظيف","الوظائف المتاحة" , "وظيفة" , "وظائف" ],
+    "responses": ["يمكنك زيارة موقعنا : www.orchtech/careers", "يمكنك الاتصال بال اتش ار الخاص بالشركة على رقم 01022002 "],
+    "context_filter": "rentalday"
+  },
+  {"tag": "الاجازات",
+    "patterns": ["الاجازة", "الاجازات" , "ما هو نظام الاجازات في الشركة ؟" ],
+    "responses": ["الاجازة متاحة بعد مرور 6 اشهر من العمل و اي اجازة قبل هذه الفترة ستخصم من المرتب", "رصيد الاجازات هو 21 يوم : 15 يوم سنويا (مخطط) و 6 ايام عادية"],
+    "context_filter": "rentalday"
+  },
+  {"tag": "تأمين اجتماعي",
+    "patterns": ["تأمين اجتماعي", "تأمين" , " ماذا عن التأمين الاجتماعي في الشركة ؟" ],
+    "responses": ["التأمين الاجتماعي يبدأ في الشركة منذ اليوم الاول"]
+  }
+]
+}

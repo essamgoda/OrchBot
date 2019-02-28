@@ -1,0 +1,16 @@
+Flask==0.12.2
+pymessenger==0.0.7.0
+fbmessenger
+gunicorn==19.6.0
+numpy==1.14.4
+pandas==0.23.0
+nltk==3.4
+tflearn==0.3.2
+tensorflow==1.8.0
+scikit-learn==0.19.1
+scipy==1.0.1
+six==1.11.0
+sklearn==0.0
+Werkzeug==0.14.1
+h5py==2.8.0
+tensorboard==1.8.0
