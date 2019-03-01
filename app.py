@@ -353,10 +353,8 @@ def download_all():
             attachment_filename= 'CSV.zip',
             as_attachment = True)
 
-@app.route('/download_users',methods=['GET'])
-def download_users():
-
-    zipf = zipfile.ZipFile('CSV.zip','w', zipfile.ZIP_DEFLATED)
+@app.route('/download_csv',methods=['GET'])
+def download_csv():
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
@@ -367,8 +365,9 @@ def download_users():
             if 'user_' in row[0]:
                 create_csv(row[0])
         download_all()
+        return send_from_directory('./', 'CSV.zip', as_attachment=True)
     except:
-        print('exp')
+        return'exp'
 
 def create_csv(name):
     conn = sqlite3.connect(DATABASE)
