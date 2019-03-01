@@ -367,7 +367,7 @@ def download_files():
                 create_csv(row[0])
 
         download_all()
-        return get_file('CSV.zip')
+        return 'saved'
     except:
         return'exception'
 
