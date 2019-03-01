@@ -341,7 +341,7 @@ def privacy():
 def index():
     return "Hello there, I'm a facebook messenger bot."
 
-@app.route('/download_all', methods=['GET']) # this is a job for GET, not POST
+#@app.route('/download_all', methods=['GET']) # this is a job for GET, not POST
 def download_all():
     zipf = zipfile.ZipFile('CSV.zip','w', zipfile.ZIP_DEFLATED)
     filenames = find_csv_filenames('./')
@@ -352,6 +352,32 @@ def download_all():
             mimetype = 'zip',
             attachment_filename= 'CSV.zip',
             as_attachment = True)
+
+@app.route('/download_users',methods=['GET'])
+def download_users():
+
+    zipf = zipfile.ZipFile('CSV.zip','w', zipfile.ZIP_DEFLATED)
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        data = c.fetchall()
+        print(data)
+        for row in data:
+            if 'user_' in row[0]:
+                create_csv(row[0])
+        download_all()
+    except:
+        print('exp')
+
+def create_csv(name):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('SELECT * FROM {}'.format(name))
+    data = c.fetchall()
+    with open(name+'.csv', 'w') as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
 
 @app.route("/files")
 def list_files():
