@@ -348,13 +348,13 @@ def download_all():
     for name in filenames:
         zipf.write(name)
     zipf.close()
-    return send_file('CSV.zip',
+    '''return send_file('CSV.zip',
             mimetype = 'zip',
             attachment_filename= 'CSV.zip',
-            as_attachment = True)
+            as_attachment = True)'''
 
-@app.route('/download_csv',methods=['GET'])
-def download_csv():
+@app.route('/download_files',methods=['GET'])
+def download_files():
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
@@ -363,11 +363,13 @@ def download_csv():
         print(data)
         for row in data:
             if 'user_' in row[0]:
+                print(row[0])
                 create_csv(row[0])
+
         download_all()
-        return send_from_directory('./', 'CSV.zip', as_attachment=True)
+        return get_file('CSV.zip')
     except:
-        return'exp'
+        return'exception'
 
 def create_csv(name):
     conn = sqlite3.connect(DATABASE)
