@@ -379,6 +379,7 @@ def create_csv(name):
     with open(name+'.csv', 'w') as f:
             writer = csv.writer(f)
             writer.writerows(data)
+    return True
 
 @app.route("/files")
 def list_files():
