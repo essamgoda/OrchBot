@@ -353,8 +353,8 @@ def download_all():
             attachment_filename= 'CSV.zip',
             as_attachment = True)'''
 
-@app.route('/download_files',methods=['GET'])
-def download_files():
+@app.route('/save_csv',methods=['GET'])
+def save_csv():
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
@@ -367,7 +367,7 @@ def download_files():
                 create_csv(row[0])
 
         download_all()
-        return 'saved'
+        return get_file('CSV.zip')
     except:
         return'exception'
 
