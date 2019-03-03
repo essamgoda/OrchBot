@@ -355,5 +355,5 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
 
