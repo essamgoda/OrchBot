@@ -1,4 +1,5 @@
-from flask import Flask, request, Response,send_file,abort, jsonify, send_from_directory
+from flask import Flask,render_template, request, Response,send_file,abort, jsonify, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
 import requests, json, random, os,zipfile
 import re
 import numpy as np
@@ -11,14 +12,21 @@ import tflearn
 import tensorflow as tf
 
 from os import listdir
-
+import Models
 import csv,datetime
 
-import sqlite3
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db/database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-DATABASE = "./db/database.db"
+db = SQLAlchemy(app)
+db.init_app(app)
+
+
+#from Model import create_user,create_msg
+
+# DATABASE = "./db/database.db"
 
 # env_variables
 quick_replies_list = [{
@@ -107,6 +115,7 @@ net = tflearn.fully_connected(net, 8)
 net = tflearn.fully_connected(net, len(train_y[0]), activation='softmax')
 net = tflearn.regression(net)
 # Define model and setup tensorboard
+
 model = tflearn.DNN(net, tensorboard_dir='tflearn_logs')
 # load our saved model
 model.load('./model.tflearn')
@@ -184,28 +193,33 @@ def webhook_action():
         messaging = entry['messaging']
         for message in messaging:
             if message.get('message'):
+
                 user_id = message['sender']['id']
+                user_details_url = "https://graph.facebook.com/v2.6/%s"%user_id
+                user_details_params = {'fields':'first_name,last_name,profile_pic', 'access_token':access_token}
+                user_details = requests.get(user_details_url, user_details_params).json()
+                user_name=user_details['first_name']
+                userid=int(user_id)
+
+                Models.create_user(user_name,0,userid)
+                count=Models.get_counter(userid)
+
                 if message['message'].get('text'):
                     msg=message['message']['text']
-                    c=get_counter(user_id)
-                    if c==len(questions):
-                        save_answers(msg,user_id)
-                        response = {
-                            'recipient': {'id': user_id},
-                            #'message': {"text": 'We are looking for an experienced WordPress and open source CMS developer to join our friendly and hard-working Website team, %s!' % link}
-                            'message': {"text": 'Thanks!'}
-                        }
-                        set_counter(user_id,0)
-                    elif c!=0:
-                        save_answers(msg,user_id)
-                        response = {
-                            'recipient': {'id': user_id},
-                            #'message': {"text": 'We are looking for an experienced WordPress and open source CMS developer to join our friendly and hard-working Website team, %s!' % link}
-                            'message': {"text": questions[c]}
-                        }
-                        save_answers(questions[c],user_id)
-                        c+=1
-                        set_counter(user_id,c)
+
+                    if count==len(questions):
+                            Models.create_msg(msg,userid)
+                            count=0
+                            Models.update_counter(count,userid)
+                    elif count!=0:
+                            Models.create_msg(msg,userid)
+                            response = {
+                                'recipient': {'id': user_id},
+                                #'message': {"text": 'We are looking for an experienced WordPress and open source CMS developer to join our friendly and hard-working Website team, %s!' % link}
+                                'message': {"text": questions[count]}
+                            }
+                            count+=1
+                            Models.update_counter(count,userid)
                     elif 'vacancy'in msg or 'vacancies' in msg:
                         response = {
                             'recipient': {'id': user_id},
@@ -215,21 +229,19 @@ def webhook_action():
                         response = {
                             'recipient': {'id': user_id},
                             #'message': {"text": 'We are looking for an experienced WordPress and open source CMS developer to join our friendly and hard-working Website team, %s!' % link}
-                            'message': {"text": questions[c]}
+                            'message': {"text": questions[count]}
                         }
-                        save_answers(questions[c],user_id)
-                        c+=1
-                        set_counter(user_id,c)
-                    elif msg=='hi':
-                        user_details_url = "https://graph.facebook.com/v2.6/%s"%user_id
-                        user_details_params = {'fields':'first_name,last_name,profile_pic', 'access_token':access_token}
-                        user_details = requests.get(user_details_url, user_details_params).json()
-                        user_name=user_details['first_name']
+                        count+=1
+                        Models.update_counter(count,userid)
+
+                    elif 'hi' in msg.lower():
                         response = {
                             'recipient': {'id': user_id},
                             'message': {"text": 'hi %s!' % user_name}
                         }
-                        set_counter(user_id,0)
+
+                        Models.update_counter(0,userid)
+
                     else:
                         user_message = entry['messaging'][0]['message']['text']
                         response = {
@@ -246,6 +258,10 @@ def webhook_action():
                     response['message']['text'] = "couldn't catch that..."
                 params  = {"access_token": access_token}
                 headers = {"Content-Type": "application/json"}
+
+                if count!=0:
+                    Models.create_msg(response['message']['text'],userid)
+
                 r = requests.post('https://graph.facebook.com/v2.6/me/messages', params=params, headers=headers, json=response)
 
 
@@ -272,65 +288,13 @@ def handle_message(user_id, user_message):
     #return "Hello "+user_id+" ! You just sent me : " + user_message + "\n" + response(user_message)
     return " " + response(user_message)
 
-def ans(msg,user_id):
-    row=[]
-    with open(str(user_id)+'.csv', 'a') as csvFile:
-        writer = csv.writer(csvFile)
-        row.append(msg)
-        #row.append(datetime.datetime.now())
-        writer.writerow(row)
-    csvFile.close()
-
-def set_counter(user_id,count):
-    conn = sqlite3.connect(DATABASE)
-    cur = conn.cursor()
-    q='CREATE TABLE if not exists counter_{} (counter INTEGER);'.format(user_id)
-    cur.execute(q)
-    conn.commit()
-    ins="INSERT INTO counter_{0} VALUES({1});".format(user_id,count)
-    print(ins)
-    cur.execute(ins)
-    conn.commit()
-    conn.close()
-
-def get_counter(user_id):
-    try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute('SELECT * FROM counter_{}'.format(user_id))
-        data = c.fetchall()
-        count=0
-        '''for row in data:
-            count=row'''
-        last_row=data[-1]
-        return last_row[0]
-    except:
-        print('exp')
-        return 0
-
-def save_answers(msg,user_id):
-    # check if the database exist, if not create the table and insert a few lines of data
-    #if not os.path.exists(DATABASE):
-    get_counter(user_id)
-    conn = sqlite3.connect(DATABASE)
-    cur = conn.cursor()
-    q='CREATE TABLE if not exists user_{} (MSG TEXT,Date_Time TEXT);'.format(user_id)
-    cur.execute(q)
-    conn.commit()
-    ins="INSERT INTO user_{0} VALUES("'"{1}"'","'"{2}"'");".format(user_id,msg,str(datetime.datetime.now()))
-    cur.execute(ins)
-    conn.commit()
-    conn.close()
-
-def csv_counter(user_id):
-    try:
-        with open(user_id+'.csv',"r") as f:
-            reader = csv.reader(f,delimiter = ",")
-            data = list(reader)
-            row_count = len(data)
-        return row_count
-    except OSError as e:
-        return 0
+def create_csv(msgs,user_name):
+    df = pd.DataFrame(msgs,columns=[''])
+    df.to_csv(user_name+'.csv', sep='\t', encoding='utf-8')
+    # with open(user_name+'.csv', 'a') as csvFile:
+    #     writer = csv.writer(csvFile, quoting=csv.QUOTE_ALL)
+    #     writer.writerow(msgs)
+    # csvFile.close()
 
 @app.route('/privacy', methods=['GET'])
 def privacy():
@@ -353,34 +317,6 @@ def download_all():
             attachment_filename= 'CSV.zip',
             as_attachment = True)'''
 
-@app.route('/save_csvs',methods=['GET'])
-def save_csvs():
-    try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        data = c.fetchall()
-        print(data)
-        for row in data:
-            if 'user_' in row[0]:
-                print(row[0])
-                create_csv(row[0])
-
-        download_all()
-        return 'saved'
-    except:
-        return'exception'
-
-def create_csv(name):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT * FROM {}'.format(name))
-    data = c.fetchall()
-    with open(name+'.csv', 'w') as f:
-            writer = csv.writer(f)
-            writer.writerows(data)
-    return True
-
 @app.route("/files")
 def list_files():
     """Endpoint to list files on the server."""
@@ -396,9 +332,28 @@ def get_file(path):
     """Download a file."""
     return send_from_directory('./', path, as_attachment=True)
 
+@app.route("/users", methods=['GET'])
+def users():
+    users = Models.User.query.all()
+    return render_template('users.html', users=users)
+
+@app.route("/users/<path:user_id>")
+def get_users(user_id):
+    """Download a file."""
+    msgs=Models.get_user_msg(user_id=user_id)
+    username=Models.get_user_name(user_id)
+    create_csv(msgs,username)
+    return send_file(username+'.csv',
+            mimetype = 'csv',
+            attachment_filename= username+'.csv',
+            as_attachment = True)
+    # return "hi "+str(user_id)
+
+
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')
+
