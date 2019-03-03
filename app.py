@@ -12,7 +12,7 @@ import tflearn
 import tensorflow as tf
 
 from os import listdir
-import Models
+
 import csv,datetime
 
 
@@ -23,7 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 db.init_app(app)
 
-
+import Models
 #from Model import create_user,create_msg
 
 # DATABASE = "./db/database.db"
