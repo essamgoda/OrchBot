@@ -56,4 +56,4 @@ class Detector:
 
         img = cv.imencode('.jpg', img)[1].tobytes()
         print(label)
-        return label
+        return img,label
