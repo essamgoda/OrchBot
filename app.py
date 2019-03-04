@@ -241,7 +241,7 @@ def webhook_action():
                     elif 'hi' in msg.lower():
                         response = {
                             'recipient': {'id': user_id},
-                            'message': {"text": 'hi %s!' % user_name}
+                            'message': {"text": 'Hi %s!' % user_name}
                         }
 
                         Models.update_counter(0,userid)
