@@ -54,4 +54,4 @@ class Detector:
                     cv.putText(img, label, (xLeftBottom+5, yLeftBottom), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
 
         img = cv.imencode('.jpg', img)[1].tobytes()
-        return img,label
+        return label
