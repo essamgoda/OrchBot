@@ -215,6 +215,11 @@ def webhook_action():
                             Models.create_msg(msg,userid)
                             count=0
                             Models.update_counter(count,userid)
+                            response = {
+                                'recipient': {'id': user_id},
+                                'message': {}
+                            }
+                            response['message']['text'] = "Thanks for your time"
                     elif count!=0:
                             Models.create_msg(msg,userid)
                             response = {
@@ -224,11 +229,6 @@ def webhook_action():
                             }
                             count+=1
                             Models.update_counter(count,userid)
-                            response = {
-                                'recipient': {'id': user_id},
-                                'message': {}
-                            }
-                            response['message']['text'] = "Thanks for your time"
                     elif 'vacancy'in msg or 'vacancies' in msg:
                         response = {
                             'recipient': {'id': user_id},
