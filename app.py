@@ -18,7 +18,7 @@ import csv,datetime
 import io
 from PIL import Image
 from ObjectDetector import Detector
-import urllib
+import urllib.request
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db/database.db'
@@ -258,7 +258,7 @@ def webhook_action():
                     attachment_link = message["message"]["attachments"][0]["payload"]["url"]
                     print(attachment_link)
 
-                    fd = urllib.urlopen(attachment_link)
+                    fd = urllib.request.urlopen(attachment_link)
                     file = Image.open(io.BytesIO(fd))
 
                     img,label = detector.detectObject(file)
