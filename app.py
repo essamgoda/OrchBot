@@ -261,14 +261,22 @@ def webhook_action():
                     fd = urllib.request.urlopen(attachment_link)
                     file = Image.open(io.BytesIO(fd.read()))
 
-                    detector = Detector()
-                    img,label = detector.detectObject(file)
+                    try:
 
-                    response = {
-                        'recipient': {'id': user_id},
-                        'message': {}
-                    }
-                    response['message']['text'] = label
+                        detector = Detector()
+                        img,label = detector.detectObject(file)
+
+                        response = {
+                            'recipient': {'id': user_id},
+                            'message': {}
+                        }
+                        response['message']['text'] = label
+                    except:
+                        response = {
+                            'recipient': {'id': user_id},
+                            'message': {}
+                        }
+                        response['message']['text'] = "couldn't catch that..."
                 else:
                     response = {
                         'recipient': {'id': user_id},
