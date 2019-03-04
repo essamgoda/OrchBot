@@ -18,7 +18,7 @@ import csv,datetime
 import io
 from PIL import Image
 from ObjectDetector import Detector
-import urllib2 as urllib
+import urllib
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db/database.db'
