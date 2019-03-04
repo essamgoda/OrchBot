@@ -51,7 +51,7 @@ quick_replies_list = [{
 }
 ]
 
-questions=['Please, write your E-mail','Please, write your mobile number','What programming languages have you used in the past? What are your top two programming languages?']
+questions=['Please write your E-mail','Please write your mobile number','Tell me more about yourself..', 'What sparked your interest in web development?','What are the responsibilities of a web developer?','What programming languages have you used in the past? ','What are your top two programming languages?','Explain the purpose of each of the HTTP request types when used with a RESTful web service?']
 # token to verify that this bot is legit
 verify_token = os.getenv('VERIFY_TOKEN', 'TESTINGTOKEN')
 # token to send messages through facebook messenger
@@ -356,4 +356,3 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
