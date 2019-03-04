@@ -15,6 +15,10 @@ from os import listdir
 
 import csv,datetime
 
+import io
+from PIL import Image
+from ObjectDetector import Detector
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db/database.db'
@@ -51,7 +55,7 @@ quick_replies_list = [{
 }
 ]
 
-questions=['Please write your E-mail','Please write your mobile number','Tell me more about yourself..', 'What sparked your interest in web development?','What are the responsibilities of a web developer?','What programming languages have you used in the past? ','What are your top two programming languages?','Explain the purpose of each of the HTTP request types when used with a RESTful web service?']
+questions=['Please enter your E-mail','Please enter your mobile number','Please Tell me more about yourself..', 'What sparked your interest in web development?','What are the responsibilities of a web developer?','What programming languages have you used in the past? ','What are your top two programming languages?','Explain the purpose of each of the HTTP request types when used with a RESTful web service?']
 # token to verify that this bot is legit
 verify_token = os.getenv('VERIFY_TOKEN', 'TESTINGTOKEN')
 # token to send messages through facebook messenger
@@ -250,6 +254,12 @@ def webhook_action():
                         }
                         response['message']['text'] = handle_message(user_id, user_message)
 
+                elif message['message'].get('attachments'):
+                    attachment_link = messaging_event["message"]["attachments"][0]["payload"]["url"]
+                    print(attachment_link)
+                    file = Image.open(attachment_link)
+                    img,label = detector.detectObject(file)
+                    print(lable)
                 else:
                     response = {
                         'recipient': {'id': user_id},
