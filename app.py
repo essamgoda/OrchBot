@@ -256,8 +256,10 @@ def webhook_action():
 
                 elif message['message'].get('attachments'):
                     attachment_link = message["message"]["attachments"][0]["payload"]["url"]
-                    print(attachment_link)
-                    file = Image.open(io.BytesIO(attachment_link))
+                    import urllib, cStringIO
+
+                    fi = cStringIO.StringIO(urllib.urlopen(attachment_link).read())
+                    file = Image.open(fi)
                     img,label = detector.detectObject(file)
                     print(lable)
                     response = {
