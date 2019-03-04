@@ -257,7 +257,7 @@ def webhook_action():
                 elif message['message'].get('attachments'):
                     attachment_link = message["message"]["attachments"][0]["payload"]["url"]
                     print(attachment_link)
-                    file = Image.open(attachment_link)
+                    file = Image.open(io.BytesIO(attachment_link))
                     img,label = detector.detectObject(file)
                     print(lable)
                     response = {
