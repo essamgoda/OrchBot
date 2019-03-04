@@ -261,7 +261,8 @@ def webhook_action():
                     fd = urllib.request.urlopen(attachment_link)
                     file = Image.open(io.BytesIO(fd.read()))
 
-                    img,label = Detector.detectObject(imName=file)
+                    detector = Detector()
+                    img,label = detector.detectObject(file)
 
                     response = {
                         'recipient': {'id': user_id},
