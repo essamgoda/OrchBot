@@ -262,12 +262,12 @@ def webhook_action():
 
                     fd = urllib.urlopen(attachment_link)
                     file = Image.open(io.BytesIO(fd)
-                    label1 = detector.detectObject(file)
+                    img = detector.detectObject(file)
                     response = {
                         'recipient': {'id': user_id},
                         'message': {}
                     }
-                    response['message']['text'] = label1
+                    response['message']['text'] = img
                 else:
                     response = {
                         'recipient': {'id': user_id},
