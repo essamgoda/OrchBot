@@ -28,7 +28,6 @@ class Detector:
                                              'model/ssd_mobilenet_v1_coco_2017_11_17.pbtxt')
 
     def detectObject(self, imName):
-        label='hi'
         img = cv.cvtColor(numpy.array(imName), cv.COLOR_BGR2RGB)
         cvNet.setInput(cv.dnn.blobFromImage(img, 0.007843, (300, 300), (127.5, 127.5, 127.5), swapRB=True, crop=False))
         detections = cvNet.forward()
@@ -48,12 +47,11 @@ class Detector:
                 cv.rectangle(img, (xLeftBottom, yLeftBottom), (xRightTop, yRightTop),
                              (0, 0, 255))
                 if class_id in classNames:
-                    label = classNames[class_id] + ": " + str(confidence)
+                    label = "It seems like "+classNames[class_id] + " with accuracy: " + str(confidence * 100)+"%"
                     labelSize, baseLine = cv.getTextSize(label, cv.FONT_HERSHEY_SIMPLEX, 0.5, 1)
                     yLeftBottom = max(yLeftBottom, labelSize[1])
                     cv.putText(img, label, (xLeftBottom+5, yLeftBottom), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
                 print(classNames[class_id])
 
         img = cv.imencode('.jpg', img)[1].tobytes()
-        print(label)
         return img,label
