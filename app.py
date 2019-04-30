@@ -59,7 +59,7 @@ questions=['Please enter your E-mail','Please enter your mobile number','Please 
 # token to verify that this bot is legit
 verify_token = os.getenv('VERIFY_TOKEN', 'TESTINGTOKEN')
 # token to send messages through facebook messenger
-access_token = os.getenv('ACCESS_TOKEN', 'EAAFATk7mVvQBAKTZCS0mIpd7woSCwX9XVZBGzHsIgHt1B1a6MGVXiLU5ZCXOMLUgvSQgbmdcZClkZBzSXRVLtCJhe0P4uU7kmNk55v4ZBn7u8govLneBO2mNQCJ1kojVm4I7b9o8Ux9vYu7EMFEBMIauOfLrZBh0kqwFufU4aeoZCNmDz6kSvwu3')
+access_token = os.getenv('ACCESS_TOKEN', '')
 
 with open('./intents1.json') as json_data:
     intents = json.load(json_data)
