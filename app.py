@@ -182,6 +182,12 @@ def response(sentence, userID='123', show_details=False):
 
 #ml
 
+@app.route('/bot')
+def chatbot():
+    w = request.args['text']
+    return jsonify(response(w))
+
+
 @app.route('/webhook', methods=['GET'])
 def webhook_verify():
     if request.args.get('hub.verify_token') == verify_token:
@@ -335,7 +341,7 @@ def privacy():
 
 @app.route('/', methods=['GET'])
 def index():
-    return "Hello there, I'm a facebook messenger bot."
+    return "Hello there. http://127.0.0.1:5000/bot?text='sentence' "
 
 #@app.route('/download_all', methods=['GET']) # this is a job for GET, not POST
 def download_all():
